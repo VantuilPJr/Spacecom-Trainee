@@ -221,7 +221,22 @@ Ordenação externa, grupos acima do limite de memória e preservação da saíd
 
 As medições foram realizadas em Windows x64, Intel Core i5-13450HX, aproximadamente 15,69 GiB de RAM e Node.js 22.18.0.
 
-Na versão atual, o tempo somado dos sete arquivos caiu de cerca de **41 s para 9,4 s** (cerca de 77%), numa execução de cada versão. O parser de bytes levou o total a cerca de 11,6 s e a varredura em latitude, a cerca de 9,4 s. A leitura, que representava cerca de 87% do tempo, caiu para cerca de 69% do total atual. Os resultados por dataset foram:
+O tempo somado dos sete arquivos caiu de cerca de **41 s** na versão original para uma **mediana de 10,1 s** (cerca de 75% a menos), medida em 5 rodadas completas com a máquina ociosa. O parser de bytes levou o total a cerca de 11,6 s e a varredura em latitude, a cerca de 9 a 10 s. A leitura, que representava cerca de 87% do tempo, caiu para cerca de 69% do total.
+
+Mediana, mínimo e máximo de 5 rodadas na versão atual:
+
+| Dataset | Mediana (ms) | Mín (ms) | Máx (ms) |
+| --- | ---: | ---: | ---: |
+| 1 | 46 | 26 | 52 |
+| 2 | 34 | 32 | 60 |
+| 3 | 58 | 52 | 73 |
+| 4 | 194 | 176 | 305 |
+| 5 | 490 | 424 | 530 |
+| 6 | 3.740 | 3.401 | 3.872 |
+| 7 | 5.386 | 5.124 | 6.240 |
+| **Total** | **10.108** | **9.260** | **10.856** |
+
+Evolução por etapa, em uma execução de cada versão:
 
 | Dataset | Original (ms) | Parser de bytes (ms) | Parser + varredura (ms) |
 | --- | ---: | ---: | ---: |
@@ -234,9 +249,9 @@ Na versão atual, o tempo somado dos sete arquivos caiu de cerca de **41 s para 
 | 7 | 22.702 | 6.534 | 5.239 |
 | **Total** | **40.970** | **11.567** | **9.413** |
 
-Nos datasets 1 a 4 as diferenças são de poucas dezenas de milissegundos e ficam dentro da variação entre execuções. O ganho aparece nos datasets maiores.
+Nos datasets 1 a 4 as diferenças são de poucas dezenas de milissegundos e ficam dentro da variação entre execuções. O ganho aparece nos datasets maiores. Execuções isoladas mostraram picos de até 19,9 s no total, causados por competição de recursos na máquina: ler o dataset 7 inteiro, sem nenhum código do projeto, leva menos de 0,5 s, e o processamento completo ficou estável entre 5,6 e 5,8 s em três rodadas seguidas. O tempo de CPU do processo é maior que o de relógio (cerca de 10 s contra 5,7 s no dataset 7), pois o coletor de lixo trabalha em paralelo: o código aloca muitos objetos de curta duração, e esse é o ponto que ainda poderia ser melhorado.
 
-As sete saídas conservaram os mesmos bytes e hashes SHA-256 da versão anterior, portanto os encontros são exatamente os mesmos. O perfil de CPU antes da mudança apontava a validação por expressões regulares, a análise do CSV e a criação de strings como os maiores custos. A etapa de detecção não foi alterada.
+As sete saídas conservaram os mesmos bytes e hashes SHA-256 da versão original, portanto os encontros são exatamente os mesmos. O perfil de CPU antes das mudanças apontava a validação por expressões regulares, a análise do CSV e a criação de strings como os maiores custos. A varredura em latitude alterou a ordem de busca dos pares na detecção, mas não o conjunto de pares avaliados nem a ordem de emissão.
 
 Medições anteriores, de uma versão intermediária da leitura: os sete arquivos passaram de **99,53 s para 69,85 s**, e a mediana do dataset 5 caiu de **5,08 s para 3,57 s**. O pico RSS amostrado foi de **99,76 MiB**, contra aproximadamente **79,66 MiB** antes dos lotes. Os lotes mantêm mais objetos temporariamente e a coleta de lixo afeta as amostras. Os tempos representam o ambiente medido e variam com carga da máquina, cache e sistema de arquivos.
 
