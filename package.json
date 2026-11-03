@@ -1,0 +1,20 @@
+{
+  "name": "spacecom-encounters",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Detector auditável de encontros espaçotemporais para o case Spacecom 2027",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.0",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "compilar": "tsc -p tsconfig.json",
+    "testar": "tsc -p tsconfig.json && node --test \"compilado/codigo/testes/*.test.js\"",
+    "executar": "node compilado/codigo/terminal.js",
+    "todos": "node compilado/codigo/terminal.js --todos"
+  }
+}

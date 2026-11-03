@@ -1,0 +1,4 @@
+node_modules/
+compilado/
+entradas/
+*.partial
